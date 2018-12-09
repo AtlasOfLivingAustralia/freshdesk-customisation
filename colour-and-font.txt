@@ -1,0 +1,26 @@
+"Colour & font" values
+(tab in portal customisation section of Freshdesk)
+
+Background colour
+Body: #EFEFEF
+Header: #FFFDFC
+Footer: #777777
+
+Tab colours
+Background: #D9D9D9
+Active tab: #4C4B4B
+
+Portal fonts
+Base font: Helvetica Neue
+Base colour: #333333
+Heading font: Source Sans Pro
+
+Link colour
+Link text: #049CDB
+Link text hover: #036690
+
+Form elements
+Heading divider & input focus glow: #F4AF1A
+Primary action button: #6C6A6A
+Secondary action button: #FFFFFF
+
