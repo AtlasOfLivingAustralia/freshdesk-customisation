@@ -1,0 +1,24 @@
+<section class="main content rounded-6 min-height-on-desktop fc-solution-home" id="solutions-home">
+	<h2 class="heading">{% translate portal.knowledge_base %}</h2>
+	{% for category in portal.solution_categories %}
+		{% if category.folders_count > 0 %}
+		<div class="cs-s">
+			<h3 class="heading"> 
+				{{ category.name | link_to: category.url }} 
+			</h3>
+			<div class="cs-g-c">
+				{% for folder in category.folders %}
+					<section class="cs-g article-list">
+						<div class="list-lead">
+							{{ folder | link_to_folder_with_count }}
+						</div>
+						{{ folder | article_list:5 }}
+					</section>
+				{% else %}
+					{{ portal | filler_for_solutions }}
+				{% endfor %}
+			</div>
+		</div>	
+		{% endif %}
+	{% endfor %}
+</section>

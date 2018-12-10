@@ -1,0 +1,108 @@
+<section class="main content rounded-6 min-height-on-desktop fc-article-show" id="article-show-{{ article.id }}">
+	<div class="breadcrumb">
+		<a href="{{ portal.solutions_home_url }}"> {% translate portal.solutions_home %} </a>
+		<a href="{{ article.category.url }}">{{ article.category.name | h}}</a>
+		<a href="{{ article.folder.url }}" class='folder-name-bread'>{{ article.folder.name | h}}</a>
+	</div>
+	<b class="page-stamp page-stamp-article">
+		<b class="icon-page-article"></b>
+	</b>
+
+	<h2 class="heading">{{ article.title | h}}
+		<a href="javascript:print();" class="icon-print solution-print-icon" title="{% translate portal.print_title %}"></a>
+	</h2>
+	{% if article.personalized_articles? %}
+	<div> {% translate portal.article.created_by %} {{ article.author }} </div> 
+	{% endif %}
+	<p>{% translate portal.article.modified_on %} {{ article.modified_on | short_day_with_time }}</p>
+	<hr />
+	{% comment %}
+	<div>
+		{% for tag in article.tags %}
+			<span class="label label-info">{{tag.name | h}}</span>
+		{% endfor %}
+	</div>
+	{% endcomment %}
+
+	<article class="article-body" id="article-body" rel="image-enlarge">
+		{{ article.body }}
+	</article>
+
+	<hr />	
+		{{article | article_attachments}}
+
+		{{article | article_voting }}
+		
+</section>
+<section class="sidebar content rounded-6" >
+ <div class='menu-container'>
+    {% if portal.has_solutions %}
+    <ul class="course_list">
+      {% for category in portal.solution_categories %}
+      {% if category.folders_count > 0 %}
+      <li>{{ category.name | link_to: category.url }}</li><ul>
+      {% for folder in category.folders %}
+      <div class="starrted">
+        <div class="folder_name"><span class='contracted'>{{folder.name}}</span></div>
+        <div class="toggled">
+          {% if folder.articles_count > 0 %}
+          {% paginate folder.articles by 100 %}
+          {% for article in paginate.collection %}
+          <li>
+            <div class="ellipsis">
+              <span class='icon-article-small'></span>
+              <a href="{{article.url}}" >{{article.title}}</a>
+            </div>
+          </li>
+          {% endfor %}
+          {% endpaginate %}
+          {% endif %}
+          <!--{% if folder.articles_count > 5 %}
+          <div class="check_more">
+            <a class="more_link" href="{{ folder.url }}">See more</a>
+          </div>
+          {% endif %} !-->
+        </div>
+      </div>
+      {% endfor %}
+      </ul>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  
+  jQuery(document).ready(function(){
+
+    var elementtext = jQuery('.folder-name-bread').text();
+
+    jQuery(".starrted span:contains("+elementtext+")").parents(".folder_name").trigger("click");
+  });
+  
+  jQuery('.folder_name').on('click',function() { 
+    jQuery(this).parent().find('.toggled').slideToggle('fast'); 
+    
+    if(jQuery(this).children("span").hasClass("expanded")){
+      jQuery(this).children("span").addClass("contracted");
+            jQuery(this).children("span").removeClass("expanded");
+    }else{
+      jQuery(this).children("span").addClass("expanded");      
+    }
+    
+  });
+</script>
+
+
+<script>
+  
+    jQuery(document).ready(function(){  
+		jQuery(".page > h3").text("Contact us");
+    	jQuery(".menu-nect a").removeClass("active");
+    	jQuery(".menu-nect a:contains('Contact')").addClass("active");
+
+  });
+  
+</script>

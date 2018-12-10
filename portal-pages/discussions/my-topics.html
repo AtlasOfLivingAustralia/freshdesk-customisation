@@ -1,0 +1,32 @@
+<section class="content rounded-6 min-height-on-desktop fc-my-topics" id="forum-my-topics">
+	<b class="pull-right">{{ portal | link_to_start_topic }}</b>
+	<div class="breadcrumb">
+			<a href="{{ portal.discussions_home_url }}">{% translate portal_pages.groups.discussions %}</a>
+	</div>
+
+	<div class="list-lead">
+		{% translate portal.my_topics %} <span class="item-count">{{ portal.my_topics_count }}</span>
+	</div>
+	<p class="intro ellipsis" title="{% translate portal.showing_my_topics %}">
+		{% translate portal.showing_my_topics %}
+	</p>	
+	{% paginate portal.my_topics by 10 %}
+		<div class="c-list topic-list" id="forum-topic-list">					
+			{% for topic in paginate.collection %}
+				<div class="c-row c-user-thumb {% if topic.sticky? %} c-topic-sticky {% endif %}">
+					{{ topic.user | profile_image }}
+					{{ topic | topic_labels }}
+					<div class="ellipsis">						
+						<a class="c-link" title="{{topic.title | h}}" href="{{topic.url}}">{{topic.title | h}}</a>
+					</div>				
+					<div class="help-text"> 
+						{{ topic | topic_info_with_votes }}
+					</div>
+				</div>
+			{% else %}
+				<p class="lead">{% translate portal.no_topics_in_this_view %}</p>
+			{% endfor %}
+		</div>			
+		{{ paginate | default_pagination }}
+	{% endpaginate %}
+</section>

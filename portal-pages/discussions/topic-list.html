@@ -1,0 +1,45 @@
+<section class="content rounded-6 min-height-on-desktop fc-forum-list {{forum.type_name}}" id="forum-{{ forum.id }}">
+
+	{% if forum.type_class != 'announcement' %}
+		<b class="pull-right">{{ portal | link_to_start_topic }}</b>
+	{% endif %}
+	<div class="breadcrumb">
+		<a href="{{ portal.discussions_home_url }}">{% translate portal_pages.groups.discussions %}</a>
+		<a href="{{ forum.forum_category.url }}">{{ forum.forum_category.name | h }}</a>
+	</div>	
+	<i class="page-stamp page-stamp-{{ forum.type_class }}">
+		<i class="icon-page-{{ forum.type_class }}"></i>
+	</i>
+	<div class="list-lead">
+		{{ forum.name|h}} <span class="item-count">{{ forum.topics_count }}</span>
+		<div class="pull-right align-right">{{ forum | follow_forum_button }}</div>
+	</div>
+	<p class="intro" title="{{forum.description|h}}">
+		{{ forum.description|h}}
+	</p>
+	
+	{{ forum | default_topic_filters }}
+
+	{% paginate forum.topics by 10 %}
+		<div class="c-list topic-list" id="forum-topic-list">					
+			{% for topic in paginate.collection %}
+				<div class="c-row c-user-thumb {% if topic.sticky? %} c-topic-sticky {% endif %}">
+					{{ topic.user | profile_image }}
+					{{ topic | topic_labels }}
+					<div class="ellipsis">
+						{{ topic | topic_small_icon }}						
+						<a class="c-link" title="{{topic.title | h}}" href="{{topic.url}}">{{topic.title | h}}</a>
+					</div>				
+					<div class="help-text"> 
+						{{ topic | topic_info_with_votes }}
+					</div>
+				</div>
+			{% else %}
+				<p class="lead">{% translate portal.no_topics_in_this_view %}</p>
+			{% endfor %}
+		</div>			
+		{{ paginate | default_pagination }}
+	{% endpaginate %}
+</section>
+	 
+

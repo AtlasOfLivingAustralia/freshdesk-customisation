@@ -1,0 +1,14 @@
+<section class="main content rounded-6 fc-new-topic">
+	<!-- To set topic title based on edit or delete -->
+	<h3 class="heading">
+		{% if topic.id %}
+			{% translate topic.edit %}
+		{% else %}
+			{% translate topic.new %}
+		{% endif %}
+	</h3>
+
+	{% snippet new_topic_form %}
+</section>
+
+<section class="sidebar hide"><br /></section>

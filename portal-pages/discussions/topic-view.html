@@ -1,0 +1,159 @@
+{% assign forum = topic.forum %}
+{% assign forum_category = forum.forum_category %}
+
+<section class="content main rounded-6 min-height-on-desktop fc-topic-view">
+	{% if forum.type_class != 'announcement' %}
+		<b class="pull-right">{{ portal | link_to_start_topic }}</b>
+	{% endif %}
+	<div class="breadcrumb">
+		<a href="{{ portal.discussions_home_url }}">{% translate portal_pages.groups.discussions %}</a>
+		<a href="{{ forum_category.url }}">{{ forum_category.name | h }}</a>
+		<a href="{{ forum.url }}">{{ forum.name | h}}</a>
+	</div>
+	
+	<section class="topic-header clearfix">
+		{{ topic | topic_labels }}
+		<b class="page-stamp page-stamp-{{ forum.type_class }}">
+			<i class="icon-page-{{ forum.type_class }}"></i>
+		</b>
+		{{ topic | topic_icon }}
+		<h2 class="post-title heading">
+			{{ topic.title | h}}
+		</h2>
+		{% if portal.user %}
+			<div class="toolbar-actions btn-group" id="topic-toolbar">
+				{% unless topic.locked? %}
+					<a href="#reply-to-post" class="btn btn-small" data-proxy-for="#new-post-form">{% translate ticket.support.reply %}</a>
+				{% endunless %}
+				{{ topic | follow_topic_button }}
+				{{ topic | link_to_topic_edit }}				
+				{{ topic | link_to_mark_as_solved }}
+			</div>
+		{% endif %}
+	</section>
+
+	<div id="topic-comments">
+		{% assign first_post = topic.first_post %}
+		<section class="user-comment {% if first_post.user.is_agent %} comment-by-agent {% endif %}" id="post-{{first_post.id}}">
+			<div class="user-info">
+				{{ first_post.user | profile_image:'user-pointer-bottom', '40px', '40px','thumb' }}				
+				<div class="user-details">
+					<h4 class="user-name">{{ first_post.user.name | h}}</h4>
+					<div class="p-info">
+						{% translate portal.topic.started %} {{ first_post.created_on | time_ago }}
+					</div>
+				</div>
+			</div>
+			<div class="p-content" rel="image-enlarge" id="post-{{first_post.id}}-description">
+				<div class="p-desc">
+					{{ first_post.body_html }}
+				</div>
+
+				{{ first_post | post_attachments }}
+
+				{% assign best_answer = topic.best_answer %}
+				{% if best_answer != nil %}
+					{{ best_answer | topic_best_answer }}
+				{% endif %}
+				{% snippet topic_vote %}
+			</div>
+			<div class="p-content hide" id="post-{{first_post.id}}-edit">
+				<div class="sloading loading-small loading-block"></div>
+			</div>
+		</section>
+
+		{{ topic | post_sort_options, topic.sort_by }}
+
+		{% paginate topic.posts by 15 %}
+			{% for post in paginate.collection %}
+				{% if post.id != first_post.id %}
+				<section class="user-comment {% if post.user.is_agent %} comment-by-agent {% endif %}" id="post-{{post.id}}">
+					<div class="user-info">
+						{{ post.user | profile_image:'user-pointer-bottom', '40px', '40px' }}
+						<div class="user-details">
+							{{ post | post_actions }}
+							<h4 class="user-name">{{ post.user.name | h}}</h4>
+							<div class="p-info">
+								{% translate portal.said %} {{ post.created_on | time_ago }}
+							</div>
+						</div>
+					</div>
+					<div class="p-content" rel="image-enlarge" id="post-{{post.id}}-description">
+						<div class="p-desc">
+							{% if post.answer? %}
+								<div>
+									<span class="label label-small label-answered">
+										{% translate forum_shared.post.answer %}
+									</span>
+								</div>
+							{% endif %}
+							{{ post.body_html }}
+						</div>
+						{{ post | post_attachments }}
+						{{ post | post_vote_button }}
+					</div>
+					<div class="p-content hide" id="post-{{post.id}}-edit">
+						<div class="sloading loading-small loading-block"></div>
+					</div>
+				</section>
+				{% endif %}
+			{% endfor %}
+		{{ paginate | default_pagination }}
+	{% endpaginate %}
+	</div>
+
+	{% if topic.locked? %}
+	{% elsif portal.user %}
+		<hr class="content-divider" />
+		<section id="reply-to-post" class="user-comment">
+			<div class="user-info">
+				{{ portal.user | profile_image:'user-pointer-bottom', '40px', '40px' }}
+				<div class="user-details">						
+					<h4 class="user-name">{{ portal.user.name | h }}</h4>
+				</div>
+			</div>
+			<div class="p-content" rel="image-enlarge">
+				<input type="text" class="special span12" 
+						placeholder="{% translate portal.topic.comment_placeholder %}" id="reply-form-proxy" 
+						data-proxy-for="#new-post-form" />
+				<section id="new-post-form" class="hide">
+					{% snippet topic_reply %}
+				</section>
+			</div>
+		</section>
+	{% else %}	
+		{{ portal | post_topic_in_portal }}
+	{% endif %}
+</section>
+{% if forum.topics_display_count > 1 or topic.locked? or topic.has_merged_topics? %}
+	<section class="sidebar content rounded-6 min-height-on-desktop fc-merge-topic">	
+		<div class="cs-g-c">
+			<section class="topic-list" id="merged-topics-list">
+				
+				{% if topic.locked? %}
+				
+					<div class="lock-merge-topic-text">
+						{% translate portal.topic.comments_closed %}
+						{% if topic.merged? %}
+							{% translate portal.topic.merge_continue %}
+							{{ topic | link_to_merged_topic }}
+						{% endif %}
+					</div>
+
+					{% if topic.has_merged_topics? or forum.topics_display_count > 1 %}
+						<hr class="content-divider">
+					{% endif %}
+
+				{% endif %}
+
+				{{ topic | merged_topics }}
+
+				{% if forum.topics_display_count > 1 and topic.has_merged_topics? %}
+						<hr class="content-divider">
+				{% endif %}
+
+				{{ topic | more_topics_list }}
+			</section>
+		</div>
+	</section>
+{% endif %}

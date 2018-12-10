@@ -1,0 +1,20 @@
+<section class="content min-height-on-desktop rounded-6 ticket-page">
+  <div class="ticket-toolbar pull-right">
+    <a href="{{ portal.ticket_export_url }}" data-target="#export-modal"
+        id="ticket-export-button" rel="freshdialog" class="hide"
+        data-submit-label="{% translate portal.tickets.submit_export %}"
+        title="{% translate portal.tickets.export_ticket_data %}">
+      {% translate portal.tickets.export %}
+    </a>
+    {% if portal.facebook_portal %}
+      <a href="{{ portal.new_ticket_url }}" class="btn btn-primary index_new_ticket" id="new_support_ticket">
+        {% translate facebook_tab.portal.new_ticket %}
+      </a>
+    {% endif %}
+  </div>
+  <div id="ticket-filter-container" class="ticket-filter">
+    {% snippet ticket_filters %}
+  </div>
+  
+  {% snippet ticket_list %}
+</section>

@@ -1,0 +1,134 @@
+<section class="main content rounded-6 min-height-on-desktop fc-ticket-view">
+	<div class="breadcrumb">
+		<a href="{{ portal.home_url }}">{% translate header.tabs.home %}</a>
+		<a href="{{ portal.tickets_home_url }}">{% translate portal.tickets.ticket_list %}</a>
+	</div>
+	
+	<section class="ticket-main">
+		{{ ticket | status_alert }}
+		
+		<h2 class="heading">#{{ ticket.id }} {{ ticket.subject | h}}</h2>
+
+		{% if portal.user %}
+			<section class="toolbar-actions" id="ticket-toolbar">
+				<span class="hide-tablet pull-right">
+					<a href="#ticket-sidebar" class="btn btn-icon btn-small btn-primary"
+						title="More ticket details" data-toggle="tooltip">
+						<i class="icon-cog-drop-light"></i>
+					</a>
+				</span>
+				<div class="btn-group" id="ticket-toolbar">
+					{% unless ticket.closed? %}
+						<a href="#reply-to-ticket" class="btn btn-small" 
+							data-proxy-for="#add-note-form" title="{% translate reply %}" 
+							data-toggle="tooltip">
+								<i class="icon-reply"></i> 
+						</a>
+						<a href="{{ ticket.close_ticket_url }}" data-method="post" 
+							class="btn btn-small" data-toggle="tooltip" 
+							title="{% translate portal.tickets.mark_closed %}">
+								<i class="icon-close-ticket"></i>
+						</a>
+						<a href="#add-people" rel="freshdialog" 
+							title="{% translate portal.tickets.add_people_title %}" data-width="400" class="btn btn-small" data-submit-label="{% translate portal.tickets.add_people %}" data-toggle="tooltip" data-close-label="{% translate close %}" title="{% translate portal.tickets.add_people %}">
+								<i class="icon-add-people"></i>
+						</a>
+					{% endunless %}
+				</div>			
+			</section>
+		{% endif %}
+
+		<section class="user-comment" id="ticket-description">			
+			<div class="user-info">
+			{% if ticket.outbound_email? %}
+				{{ ticket.outbound_initiator | profile_image:'user-pointer-bottom', '40px', '40px' }}
+				<div class="user-details">
+					<h4 class="user-name">{{ ticket.outbound_initiator.name | h}}</h4>, 
+					<span class="p-info">{% translate portal.reported %} {{ ticket.created_on | time_ago }}</span>
+				</div>
+			{% else %}
+				{{ ticket.requester | profile_image:'user-pointer-bottom', '40px', '40px' }}
+				<div class="user-details">
+					<h4 class="user-name">{{ ticket.requester.name | h}}</h4>, 
+					<span class="p-info">{% translate portal.reported %} {{ ticket.created_on | time_ago }}</span>
+					<div class="p-info"> {{ ticket.cc_content }} </div>
+				</div>
+			{% endif %}
+			</div>
+			<div class="p-content" rel="image-enlarge">
+				<div class="p-desc">
+					{{ ticket.description_html }}
+					{{ ticket | freshfone_audio_dom }}
+				</div>
+
+				{{ ticket | ticket_attachemnts }}
+			</div>
+		</section>
+
+		<section id="ticket-comments">
+			{% for comment in ticket.public_comments %}
+				<section class="user-comment {% if comment.by_agent %} comment-by-agent {% endif %}" 
+						 id="ticket-note-{{ comment.id }}">
+
+					<div class="user-info">
+						{{ comment.user | profile_image:'user-pointer-bottom', '40px', '40px' }}
+						<div class="user-details">
+							<h4 class="user-name">{{ comment.user.name | h }}</h4>,  
+							<span class="p-info" title="{{ comment.created_on | short_day_with_time }}">{% translate portal.said %} {{ comment.created_on | time_ago }}</span>
+							<div class="p-info"> {{ comment.cc_content }} </div>
+						</div>
+					</div>
+					
+					<div class="p-content" rel="image-enlarge">						
+						<div class="p-desc">
+							{{ comment | custom_survey_data}}
+							{{ comment.description }}
+							{{ comment | freshfone_audio_dom }}
+						</div>
+
+						{{ comment | comment_attachments }}
+
+					</div>
+				</section>
+			{% endfor %}
+			{% if ticket.closed? %}
+				{{ ticket | status_alert }}
+			{% endif %}
+			<section id="reply-to-ticket" name="reply-to-ticket" class="user-comment {% if ticket.closed? %}hide{% endif %}">
+				<div class="user-info">
+					{{ portal.user | profile_image:'user-pointer-bottom', '40px', '40px' }}
+					<div class="user-details">
+						<h4 class="user-name">{{ portal.user.name | h}}</h4>
+					</div>
+				</div>
+				<div class="p-content" rel="image-enlarge">
+					<input type="text" class="special span12" 
+							placeholder="{% translate portal.tickets.reply_placeholder %}" id="add-note-form-proxy" 
+							data-proxy-for="#add-note-form" />
+
+					<div id="add-note-form" class="hide">
+						{% snippet ticket_reply %}
+					</div>
+				</div>
+			</section>
+		</section>
+	</section>
+</section>
+
+<section class="sidebar content rounded-6 ticket-form-sidebar" id="ticket-sidebar">
+	{% assign agent = ticket.agent %}
+	{% if agent_visible == true and agent %}
+		<div class="widget agent-details">
+			<h3 class="lead">{% translate agent_working_on_this_ticket %}</h3>
+			{{ agent | profile_image:'', '40px', '40px' }}
+			<div class="agent_name_text"><b>{{ agent.name }}</b></div>
+			<div>{{ agent.job_title }}</div>
+		</div>
+	{% endif %}
+
+	{% snippet ticket_survey %}
+	
+	{% snippet ticket_details %}	
+</section>
+
+{% snippet ticket_add_people %}

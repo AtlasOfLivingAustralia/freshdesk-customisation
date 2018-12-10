@@ -1,0 +1,74 @@
+<section class="main content rounded-6 min-height-on-desktop fc-community-content">
+	<h2 class="heading">{% translate portal.community_forums %}</h2>
+	<div class="start-topic">{{ portal | link_to_start_topic }}</div>
+	{% for category in portal.forum_categories %}
+		{% if category.forums_count > 0 %}
+			<div class="cs-s">
+				<h3 class="heading">
+					{{ category.name | link_to: category.url }}
+				</h3>
+				<div class="cs-g-c">
+				{% for forum in category.forums %}
+					<section class="cs-g topic-list">
+						<div class="list-lead badge-{{ forum.type_class }}">
+							{{ forum | link_to_forum_with_count }}
+						</div>
+						{{ forum | topic_list:5 }}
+					</section>
+				{% endfor %}
+				</div>
+			</div>
+		{% endif %}
+	{% endfor %}
+</section>
+
+<section class="sidebar content rounded-6 fc-topics-content">
+	{% if portal.recent_popular_topics.size > 0 %}
+		<section class="cs-g-c topic-list">
+			<div class="list-lead">{% translate portal.popular_topics %}</div>
+			<p class="intro">{% translate portal.showing_recently_popular_topics %}</p>
+			<ul>
+			{% for topic in portal.recent_popular_topics %}
+				<li class="cs-g-3">
+					<div class="ellipsis">
+						<a href="{{topic.url}}">{{topic.title | h}}</a>
+					</div>
+					<div class="help-text">
+						{{ topic | topic_info }}
+					</div>
+				</li>
+			{% endfor %}
+			</ul>
+		</section>
+	{% endif %}
+
+	{% if portal.my_topics.size > 0 %}
+		<section class="cs-g-c topic-list">
+			<div class="list-lead">{% translate portal.my_topics %}</div>
+			<p class="intro">{% translate portal.showing_my_topics %}</p>
+			<ul>
+			{% for topic in portal.my_topics limit:5 %}
+				<li class="cs-g-3">
+					<div class="ellipsis">
+						<a href="{{topic.last_post_url}}">{{topic.title | h}}</a>
+					</div>
+					<div class="help-text">
+						{{ topic | my_topic_info }}
+						{% if topic.last_post.present? %}
+							<div class="my_topics_right">
+								{{ topic.last_post.body | h | truncate:60 }}
+								{% if topic.last_post.body.size > 60 %}
+									<a href="{{ topic.last_post_url }}">{% translate more %}</a>
+								{% endif %}
+							</div>
+						{% endif %}
+					</div>
+				</li>
+			{% endfor %}
+			</ul>
+			{% if portal.my_topics_count > 5 %}
+				<a href="{{portal.my_topics_url}}" class="see-more">{% translate portal.topic.all_topics %}</a>
+			{% endif %}
+		</section>
+	{% endif %}
+</section>

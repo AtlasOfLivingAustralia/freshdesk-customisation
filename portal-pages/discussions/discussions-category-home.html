@@ -1,0 +1,24 @@
+<section class="main content rounded-6 min-height-on-desktop fc-discussion-category" id="discussions-category-{{ category.id }}"> 
+	<div class="breadcrumb"> 
+		<a href="{{ portal.discussions_home_url }}">{% translate portal.community_forums %}</a> 
+	</div> 
+	<div class="start-topic">
+		{{ portal | link_to_start_topic }}
+	</div>
+	<h2 class="heading">
+		{{ category.name | h }}
+	</h2>
+	{% if category.forums_count > 0 %}
+		<div class="cs-g-c">
+		{% for forum in category.forums %}
+			<section class="cs-g topic-list">
+				<div class="list-lead badge-{{ forum.type_class }}">
+					{{ forum | link_to_forum_with_count }}
+				</div>
+				{{ forum | topic_list:5 }}
+			</section>
+		{% endfor %}
+		</div>
+	{% endif %}
+</section> 
+
